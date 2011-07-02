@@ -1,0 +1,34 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    ZenTest (4.4.2)
+    autotest-growl (0.2.9)
+    diff-lcs (1.1.2)
+    multi_json (1.0.3)
+    rack (1.3.0)
+    rcov (0.9.9-java)
+    rspec (2.3.0)
+      rspec-core (~> 2.3.0)
+      rspec-expectations (~> 2.3.0)
+      rspec-mocks (~> 2.3.0)
+    rspec-core (2.3.1)
+    rspec-expectations (2.3.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.3.0)
+    sinatra (1.2.6)
+      rack (~> 1.1)
+      tilt (>= 1.2.2, < 2.0)
+    tilt (1.3.2)
+    zmq (2.1.3)
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  ZenTest (~> 4.4.2)
+  autotest-growl
+  multi_json
+  rcov
+  rspec (~> 2.3.0)
+  sinatra (~> 1.2.0)
+  zmq

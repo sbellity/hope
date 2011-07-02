@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>Hope Server v<%= Hope::VERSION %></title>
+  </head>
+  
+  <body>
+    <% Hope.engines.each do |engine_name, engine| %>
+    <h1>Engine: <%= engine_name %> (CurrentTime: <%= engine.runtime.getCurrentTime %>)</h1>
+    <h2>Variables</h2>
+    <table>
+      <tr>
+        <th>key</th>
+        <th>value</th>
+      </tr>
+      <% engine.runtime.getVariableValueAll.each do |key, value| %>
+      <tr>
+        <td><%= key %></td>
+        <td><%= value.to_s %></td>
+      </tr>
+      <% end %>
+    </table>
+    
+    
+    
+    <h2>Statements</h2>
+    <table>
+      <tr>
+        <th>name</th>
+        <th>text</th>
+        <th>state</th>
+      </tr>
+      <% engine.statements.each do |s_name, statement|%>
+      <tr>
+        <td><%= s_name %></td>
+        <td><%= statement.getText %></td>
+        <td><%= statement.getState %></td>
+      </tr>
+      <% end %>
+    </table>
+    
+    <% end %>
+  </body>
+</html>
