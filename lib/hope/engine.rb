@@ -14,6 +14,8 @@ module Hope
   
   class Engine
     
+    java_import com.espertech.esper.client.EPServiceProviderManager
+    
     attr_reader :provider, :uri
     
     def self.get uri=nil
@@ -21,22 +23,43 @@ module Hope
     end
     
     def self.all
-      com.espertech.esper.client.EPServiceProviderManager.getProviderURIs.to_a
+      EPServiceProviderManager.getProviderURIs.to_a
     end
     
     def initialize uri=nil
       @uri = uri || "default"
       Hope.register_engine(self)
       provider
+      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self
+      @received = 0
     end
     
+    def on_readable(socket, messages)
+      # @received += messages.length
+      puts "\n\n\n---New Message: #{messages.class} (#{messages.length})"
+      source = messages.unshift
+      puts "\n\n\n---After unshift (#{source}) Message: #{messages.class} (#{messages.length})"
+      
+      messages.each { |m| 
+        # puts "Message: #{m.copy_out_string}"
+        self.sendEvent(m.copy_out_string) 
+      }
+    end    
+    
+    def subscribe source_name
+      @sub.subscribe source_name
+    end
+
+    def unsubscribe source_name
+      @sub.unsubscribe source_name
+    end
 
     # Provider API
     def provider
       if uri.nil?
-        @provider ||= com.espertech.esper.client.EPServiceProviderManager.getDefaultProvider
+        @provider ||= EPServiceProviderManager.getDefaultProvider
       else
-        @provider ||= com.espertech.esper.client.EPServiceProviderManager.getProvider(uri)
+        @provider ||= EPServiceProviderManager.getProvider(uri)
       end
     end
     
@@ -61,15 +84,30 @@ module Hope
     end
     
     def statements
-      statement_names.inject({}) { |ss,n| ss.merge(n => admin.getStatement(n)) }
+      statement_names.map { |n| Hope::Statement.new(admin.getStatement(n)) } 
+    end
+    
+    def statement stmt_name
+      s = admin.getStatement stmt_name
+      Statement.new(s) unless s.nil?
     end
     
     def add_epl epl, name=nil
-      admin.createEPL epl, name
+      name = nil if name.blank?
+      Hope::Statement.new admin.createEPL(epl, name)
     end
     
     def add_pattern pattern, name=nil
-      admin.createPattern pattern, name
+      name = nil if name.blank?
+      Hope::Statement.new admin.createPattern(pattern, name)
+    end
+    
+    def stop
+      admin.stopAllStatements
+    end
+    
+    def start
+      admin.startAllStatements
     end
     
     # Runtime API
@@ -77,11 +115,16 @@ module Hope
       provider.getEPRuntime
     end
     
+    def sendEvent(e)
+      runtime.sendEvent(e)
+    end
+    
     # Misc
     def serializable_hash
       {
         :id => uri,
-        :statements => statement_names
+        :received => @received,
+        :statements => statements.map(&:serializable_hash)
       }
     end
     

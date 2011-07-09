@@ -1,0 +1,22 @@
+<div id="dialog" style="display:none"></div>
+
+<div id="layout">
+  <div id="header" class="header">
+    <span class="logo">Hope !</span>
+  </div>
+
+  <div id="main" class="main">
+    <div class="side">
+      <h2>Engines</h2>
+      <div id="engines_list" class="side_content"></div>
+      
+      <h2>Sources</h2>
+      <div id="sources_list" class="side_content"></div>
+    </div>
+    <div class="current current_engine"></div>
+  </div>
+</div>
+
+<div id="footer" class="footer">
+  ...
+</div>

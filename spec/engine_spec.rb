@@ -42,15 +42,21 @@ describe Hope::Engine do
     it "should keep track of all engines" do
       com.espertech.esper.client.EPServiceProviderManager.getProviderURIs.to_a.sort.should == Hope.engines.keys.sort
     end
-    
+        
   end
   
   describe "manage statements" do
     
     it "should be able to add a new unnamed epl statement" do
       st = @engine.add_epl "select * from java.lang.String"
-      @engine.statement_names.should include(st.getName)
-      st.isPattern.should be_false
+      @engine.statement_names.should include(st.name)
+      st.pattern?.should be_false
+    end
+    
+    it "should fetch a statement from its name" do
+      st = @engine.add_epl "select * from java.lang.String"
+      @engine.statement_names.should include(st.name)
+      @engine.statement(st.name).should be_an_instance_of Hope::Statement
     end
     
     it "should be able to add a new named epl statement" do
@@ -58,12 +64,18 @@ describe Hope::Engine do
       @engine.add_epl "select * from java.lang.String", name
       @engine.statement_names.should include(name)
     end
-
+    
+    it "engine.statements should be instances of Hope::Statement" do
+      @engine.add_epl "select * from java.lang.String"
+      @engine.statements.last.should be_an_instance_of Hope::Statement
+    end
+    
     it "should be able to add a new pattern" do
       st = @engine.add_pattern "every java.lang.String"
-      @engine.statement_names.should include(st.getName)
-      st.isPattern.should be_true
+      @engine.statement_names.should include(st.name)
+      st.pattern?.should be_true
     end
+    
     
   end
   

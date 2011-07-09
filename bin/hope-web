@@ -1,9 +1,15 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env jruby
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
+require 'thin'
 require 'sinatra'
 require 'hope'
 require 'hope/server'
 
-Hope::Server.run!
+
+EM::run {
+  Kernel.trap("INT") { puts "Got INT signal"; EM.stop; exit(0) }
+  Kernel.trap("TERM") { puts "Got TERM signal"; EM.stop; exit(0) }
+  Hope::Server.run!
+}

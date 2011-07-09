@@ -18,12 +18,14 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new('>= 1.3.6')
 
-  s.add_runtime_dependency      'sinatra', '> 1.2.0'
-  s.add_runtime_dependency      'json'
-  s.add_runtime_dependency      'multi_json',     '~> 1.0.2'
+  s.add_runtime_dependency      'sinatra',        '~> 1.0.0'
+  s.add_runtime_dependency      'json-jruby',     '~> 1.4'
   
   s.add_development_dependency  'ZenTest',        '~> 4.5'
   s.add_development_dependency  'rake',           '~> 0.9.2'
   s.add_development_dependency  'rspec',          '~> 2.6'
-  s.add_development_dependency  'simplecov',      '~> 0.4'
+  s.add_development_dependency  'rcov',           '~> 0.9.9'
+  s.add_development_dependency  'eco',            '~> 1.0.0'
+  # s.add_development_dependency  'therubyrhino',   '~> 1.72.8'
+  s.add_development_dependency  'watchr'
 end

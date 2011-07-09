@@ -1,0 +1,18 @@
+<h1>Engine: <%= @engine.id %></h1>
+
+<button class="newStatement">Add Statement</button>
+
+
+<h2>Statements</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>STATE</th>
+      <th>TEXT</th>
+      <th>DESTROYED?</th>
+    </tr>
+  </thead>
+  <tbody class="statements_list"></tbody>
+</table>
+
