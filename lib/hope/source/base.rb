@@ -3,7 +3,10 @@ module Hope
   
     attr_reader :name, :options
     
-  
+    def self.event_types
+      []
+    end
+    
     # Misc
     def serializable_hash
       {

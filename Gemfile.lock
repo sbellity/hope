@@ -2,8 +2,10 @@ PATH
   remote: .
   specs:
     hope (0.0.1-java)
+      em-zeromq (~> 0.2.1)
       json-jruby (~> 1.4)
       sinatra (~> 1.0.0)
+      thin
 
 GEM
   remote: http://rubygems.org/
@@ -78,13 +80,11 @@ DEPENDENCIES
   ZenTest (~> 4.5)
   autotest-growl
   eco (~> 1.0.0)
-  em-zeromq (~> 0.2.1)
   growl
   hope!
   rake (~> 0.9.2)
   rcov (~> 0.9.9)
   rspec (~> 2.6)
   sinatra-reloader
-  thin
   twitter-stream
   watchr

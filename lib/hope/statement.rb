@@ -33,7 +33,7 @@ module Hope
     def_delegator :@ep_statement, :isDestroyed, :destroyed?
 
     def_delegator :@ep_statement, :addListener, :add_listener
-    def_delegator :@ep_statement, :getStatementAwareListeners, :get_listeners
+    def_delegator :@ep_statement, :getUpdateListeners, :get_listeners
     
     def to_s
       "[#{name}:#{event_type}] (#{state}) : #{text}"
@@ -57,7 +57,7 @@ module Hope
         :is_pattern   => pattern?,
         :event_type   => event_type.getName,
         :is_destroyed => destroyed?,
-        :listeners    => get_listeners.map { |l| { :name => l.name }}
+        :listeners    => get_listeners.map { |l| l.serializable_hash  }
       }
     end
     

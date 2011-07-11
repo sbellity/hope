@@ -19,6 +19,13 @@ module Hope
         end
       end
       
+      def serializable_hash
+        {
+          :id => name,
+          :name => name
+        }
+      end
+      
     end
   end
 end

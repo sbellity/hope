@@ -30,24 +30,39 @@ module Hope
       @uri = uri || "default"
       Hope.register_engine(self)
       provider
-      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self
+      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self if EM.reactor_running?
       @received = 0
+      @registered_sources = {}
+      @registered_types = {}
     end
     
     def on_readable(socket, messages)
-      # @received += messages.length
-      puts "\n\n\n---New Message: #{messages.class} (#{messages.length})"
-      source = messages.unshift
-      puts "\n\n\n---After unshift (#{source}) Message: #{messages.class} (#{messages.length})"
-      
-      messages.each { |m| 
-        # puts "Message: #{m.copy_out_string}"
-        self.sendEvent(m.copy_out_string) 
-      }
+      @received += 1
+      src, msg = messages
+      src_name = src.copy_out_string
+      if self.register_source(src_name)
+        evt = JSON.parse(msg.copy_out_string)
+        # puts "OnReadable, sendding: #{evt.inspect}"
+        self.sendEvent(evt["data"], evt["type"])
+      else
+        puts "Error: SOURCE #{src_name}, not registered !"
+      end
     end    
+
+    def register_source src_name
+      return true if @registered_sources[src_name]
+      src = Hope::Source.sources[src_name]
+      return false if src.nil?
+      src.class.event_types.each do |event_type|
+        # puts "Adding eventType to engine #{self.uri}: #{event_type.name}:\n #{event_type.properties.inspect}"
+        self.add_event_type(event_type)
+      end
+      @registered_sources[src] = src
+    end
     
     def subscribe source_name
       @sub.subscribe source_name
+      register_source(source_name)
     end
 
     def unsubscribe source_name
@@ -102,6 +117,12 @@ module Hope
       Hope::Statement.new admin.createPattern(pattern, name)
     end
     
+    def add_event_type event_type
+      return if @registered_types[event_type.name]
+      @registered_types[event_type.name] = event_type.schema
+      add_epl(event_type.schema)
+    end
+    
     def stop
       admin.stopAllStatements
     end
@@ -115,8 +136,8 @@ module Hope
       provider.getEPRuntime
     end
     
-    def sendEvent(e)
-      runtime.sendEvent(e)
+    def sendEvent(e, type)
+      runtime.sendEvent(e, type)
     end
     
     # Misc

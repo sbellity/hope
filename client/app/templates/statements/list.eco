@@ -1,8 +1,7 @@
 <td><%= @statement.id %></td>
 <td><%= @statement.get('state') %></td>
 <td><%= @statement.get('text') %></td>
-<td><%= @statement.get('is_destroyed') %></td>
-<td><%= _.map(@statement.listeners, (l)-> l.get("name")).join(", ") %></td>
+<td><%= _.map(@statement.listeners.models, (l)-> l.get("name")).join(", ") %></td>
 <td>
   <button class='statement-start'>START</button>
   <button class='statement-stop'>STOP</button>

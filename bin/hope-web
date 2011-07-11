@@ -11,5 +11,6 @@ require 'hope/server'
 EM::run {
   Kernel.trap("INT") { puts "Got INT signal"; EM.stop; exit(0) }
   Kernel.trap("TERM") { puts "Got TERM signal"; EM.stop; exit(0) }
+  Hope::configure(ARGV[0]) unless ARGV[0].nil?
   Hope::Server.run!
 }

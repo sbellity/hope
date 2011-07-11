@@ -7,10 +7,10 @@
 <table>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>STATE</th>
-      <th>TEXT</th>
-      <th>DESTROYED?</th>
+      <th>Id</th>
+      <th>State</th>
+      <th>Text</th>
+      <th>Listeners</th>
     </tr>
   </thead>
   <tbody class="statements_list"></tbody>

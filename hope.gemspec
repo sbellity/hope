@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email           = ['sbellity@gmail.com']
 
   s.executables     = 'hope-web'
-  s.files           = Dir.glob("{bin,lib}/**/*") + %w(README.rdoc LICENCE.txt Gemfile neo4j.gemspec)
+  s.files           = Dir.glob('{bin,lib}/**/*') + %w(README.rdoc LICENCE.txt Gemfile neo4j.gemspec)
   
   s.platform        = 'java'
   s.require_paths   = ['lib']
@@ -20,6 +20,9 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency      'sinatra',        '~> 1.0.0'
   s.add_runtime_dependency      'json-jruby',     '~> 1.4'
+  s.add_runtime_dependency      'em-zeromq',      '~> 0.2.1'
+  s.add_runtime_dependency      'thin'
+  
   
   s.add_development_dependency  'ZenTest',        '~> 4.5'
   s.add_development_dependency  'rake',           '~> 0.9.2'
