@@ -22,12 +22,21 @@ class HopeView extends Backbone.View
     
 
   selectEngine: (id)=>
-    @$(".side .selected").removeClass("selected")
     return unless e = @app.engines.get(id)
+    @$(".side .selected").removeClass("selected")
     @current_view = new EngineView(model: e, el: @$(".current"))
     @current_view.el = @$(".current")
     @current_view.render()
     $("#engine-engines-list-#{e.cid}").addClass("selected")
+
+  selectSource: (id)=>
+    return unless s = @app.sources.get(id)
+    @$(".side .selected").removeClass("selected")
+    @current_view = new SourceView(model: s, el: @$(".current"))
+    @current_view.el = @$(".current")
+    @current_view.render()
+    $("#source-sources-list-#{s.cid}").addClass("selected")
+
   
   renderEnginesList: =>
     @$("#engines_list").html('')

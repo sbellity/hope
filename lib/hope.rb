@@ -23,43 +23,45 @@ require "hope/source/twitter"
 
 require "hope/listener/base"
 
+require 'hope/server'
+
 module Hope
   include Java
-  
+
   def self.ctx
-    @ctx ||= EM::ZeroMQ::Context.new(1)    
+    @ctx ||= EM::ZeroMQ::Context.new(1)
   end
-  
+
   def self.pub
     @pub ||= ctx.bind ZMQ::PUB, 'ipc://hope'
   end
-  
+
   def self.configure config_file, &block
     config = YAML::load_file(config_file)
-    
+
     config["engines"].each do |uri, econf|
       # Create engine
       e = Hope::Engine.new(uri)
-      
+
       # Subscribe to named sources
       econf['subscriptions'].each do |sub|
         e.subscribe(sub)
       end
-      
+
       # Add and configure Statements
       econf['statements'].each do |sn, st|
         s = e.add_epl st['epl'], sn
         # s.add_listener Hope::Listener::Base.new
       end
     end unless config["engines"].nil?
-    
+
     # Add Sources
     config["sources"].each do |sn, src_opts|
       source = Hope::Source::Twitter.new(sn, src_opts)
     end unless config["sources"].nil?
-    
+
     yield if block_given?
   end
-  
+
 end
 

@@ -1,1 +1,1 @@
-<h1>Source: <%= @source.name %></h1>
+<h1>Source: <%= @source.id %></h1>

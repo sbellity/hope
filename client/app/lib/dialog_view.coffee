@@ -1,7 +1,6 @@
 class DialogView extends Backbone.View
   
   initialize: ->
-    console.log("Calling init on DialogView with el: ", @el)
     $(@el).dialog({ autoOpen: false, minWidth: 1000 })
     
   render: ->

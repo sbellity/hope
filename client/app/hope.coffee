@@ -8,23 +8,24 @@ class HopeWeb
     @boostrap()
     
   boostrap: ->
-    @engines = new EngineCollection
-    @sources = new SourceCollection
-    @engines.bind "all", (e, data)=>
-      console.log("engines collection event... #{e}", data)
-      @view.renderEnginesList()
-    @sources.bind "all", (e, data)=>
-      console.log("sources collection event... #{e}", data)
-      @view.renderSourcesList()
-    @engines.fetch(success: @onReady)
-    @sources.fetch()
+    $.get("/bootstrap", (res)=>
+      @engines = new EngineCollection(res.engines)
+      @sources = new SourceCollection(res.sources)
+      @engines.bind "all", (e, data)=>
+        console.log("engines collection event... #{e}", data)
+        @view.renderEnginesList()
+      @sources.bind "all", (e, data)=>
+        console.log("sources collection event... #{e}", data)
+        @view.renderSourcesList()    
+      @onReady()
+    )
     
   onReady: =>
     console.log("Hope ready !")
     $("#loading").hide()
     @view.render()
     $(@view.el).show()
-    @controller = new HopeController(app: this)
+    @router = new HopeRouter(app: this)
     Backbone.history.start()
     
         

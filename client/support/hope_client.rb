@@ -19,7 +19,7 @@ class HopeClient
   end
   
   def coffee_files
-    ["#{@base_path}/hope.coffee"] + %w{ lib models collections helpers controllers views }.map do |d|
+    ["#{@base_path}/hope.coffee"] + %w{ lib models collections helpers routers views }.map do |d|
       Dir.glob("#{@base_path}/#{d}/**/*.coffee")
     end.flatten.uniq.compact
   end
