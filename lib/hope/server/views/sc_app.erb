@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Hope Server v<%= Hope::VERSION %></title>
+    
+    <link rel='stylesheet' href='/css/hope.css' type='text/css' media="screen">
+    <link rel='stylesheet' href='/css/Aristo/jquery-ui-1.8.7.custom.css' type='text/css' media="screen">
+    <script type="text/javascript" src="/js/jquery-1.6.1.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.8.14.custom.min.js"></script>
+    <script type="text/javascript" src="/js/sproutcore-2.0.beta.1.js"></script>
+    <script type="text/javascript" src="/js/sproutcore-datastore-2.0.beta.1.js"></script>
+    <script type="text/javascript" src="/js/sc-hope.js"></script>
+  </head>
+  
+  <body>
+    <div id="loading">loading...</div>
+    <div id="hope" style="display:none;">
+      <div id="dialog" style="display:none"></div>
+
+      <div id="layout">
+        <div id="header" class="header">
+          <span class="logo">
+            <script type="text/html">
+            {{Hope.name}}
+            </script>
+          </span>
+        </div>
+        <div id="main" class="main">
+          <div class="side">
+            <script type="text/html">
+            {{#view nbEnginesBinding="Hope.enginesController.length"}}
+            <h2>{{nbEngines}} Engines</h2>
+            <div id="engines_list" class="side_content">
+              {{#collection contentBinding="Hope.enginesController" tagName="ul" itemClass="engine"}}
+                {{content.id}}
+              {{/collection}}
+            </div>
+            {{/view}}
+            </script>
+            
+            <script type="text/html">
+            {{#view nbSourcesBinding="Hope.sourcesController.length"}}
+            <h2>{{nbSources}} Sources</h2>
+            <div id="sources_list" class="side_content">
+              {{#collection contentBinding="Hope.sourcesController" tagName="ul" itemClass="source"}}
+                {{content.id}}
+              {{/collection}}
+            </div>
+            {{/view}}
+            </script>
+          </div>
+          
+          <div class="current current_engine"></div>
+        </div>
+      </div>
+
+      <div id="footer" class="footer">
+        <script type="text/html">
+        {{#collection contentBinding="Hope.enginesController" itemClass="engine"}}
+          {{content.id}}:{{content.received }}
+        {{/collection}}
+        </script>
+      </div>
+    </div>      
+  </body>
+</html>

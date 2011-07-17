@@ -39,8 +39,9 @@ module Hope
       "[#{name}:#{event_type}] (#{state}) : #{text}"
     end
     
-    def initialize ep_statement
+    def initialize ep_statement, pub=true
       @ep_statement = ep_statement
+      @pub = Hope.ctx.bind ZMQ::PUB, "ipc://#{Hope.channel}/engines/#{name}" if pub
     end
 
     def updated_at

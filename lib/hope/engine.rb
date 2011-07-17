@@ -30,7 +30,7 @@ module Hope
       @uri = uri || "default"
       Hope.register_engine(self)
       provider
-      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self if EM.reactor_running?
+      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://#{Hope.channel}", self if EM.reactor_running?
       @received = 0
       @registered_sources = {}
       @registered_types = {}

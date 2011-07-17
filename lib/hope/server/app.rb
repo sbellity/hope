@@ -28,6 +28,10 @@ module Hope
         erb :app
       end
       
+      get "/sc/?" do
+        erb :sc_app
+      end
+      
       get "/bootstrap" do
         respond_with({
           :engines => Hope.engines.values.map { |e| e.serializable_hash },

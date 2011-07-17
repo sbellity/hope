@@ -33,11 +33,17 @@ module Hope
   end
 
   def self.pub
-    @pub ||= ctx.bind ZMQ::PUB, 'ipc://hope'
+    @pub ||= ctx.bind ZMQ::PUB, "ipc://#{self.channel}"
+  end
+  
+  def self.channel
+    @channel_name || "hope"
   end
 
   def self.configure config_file, &block
     config = YAML::load_file(config_file)
+    
+    @channel_name = config["channel"] || "hope"
 
     config["engines"].each do |uri, econf|
       # Create engine
