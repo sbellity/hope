@@ -6,9 +6,7 @@ module Hope
         def self.registered app
 
           app.get "/sources" do
-            # respond_with Hope::Source.sources.values.map(&:serializable_hash)
-            # respond_with "bitly" => { "name" => "YO", "type" => "Twitter..." }
-            respond_with "B" => "CD"
+            respond_with Hope::Source.sources.values.map(&:serializable_hash)
           end
 
           app.post "/sources" do
