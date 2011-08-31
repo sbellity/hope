@@ -1,7 +1,7 @@
 class HopeWeb
   
   constructor: (el)->
-    @version = "0.0.1"
+    @version = "0.1.0"
     @view = new HopeView(el: $("##{el}"), app: this)
     window.location.hash = "/" if window.location.hash.length == 0
     console.log("Calling bootstrap on Hope")

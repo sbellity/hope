@@ -12,7 +12,7 @@ module Hope
     end
   
     def self.unregister src
-      self.engines.delete src.name
+      self.sources.delete src.name
     end
   
   end

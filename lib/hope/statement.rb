@@ -34,6 +34,9 @@ module Hope
 
     def_delegator :@ep_statement, :addListener, :add_listener
     def_delegator :@ep_statement, :getUpdateListeners, :get_listeners
+    def_delegator :@ep_statement, :removeListener, :remove_listener
+    def_delegator :@ep_statement, :removeAllListeners, :remove_all_listeners
+    
     
     def to_s
       "[#{name}:#{event_type}] (#{state}) : #{text}"

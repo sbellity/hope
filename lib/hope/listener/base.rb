@@ -16,7 +16,16 @@ module Hope
       def update(newEvents, oldEvents)
         newEvents.each do |event|
           puts "[#{@name}] New event (#{event.getUnderlying.class}): #{event.getUnderlying.toString rescue event.getUnderlying.inspect}"
+        end unless newEvents.nil?
+        
+        unless oldEvents.nil?
+          oldEvents.each do |event|
+            puts "[#{@name}] Old Event (#{event.getUnderlying.class}): #{event.getUnderlying.toString rescue event.getUnderlying.inspect}"
+          end 
+        else
+          puts "NO oldEvents here..."
         end
+        
       end
       
       def serializable_hash

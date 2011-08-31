@@ -2,6 +2,8 @@
 
 <button class="newStatement">Add Statement</button>
 
+<h2>Subscriptions</h2>
+<%= @engine.get('subscriptions').join(", ") %>
 
 <h2>Statements</h2>
 <table>

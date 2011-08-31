@@ -1,9 +1,9 @@
 module Hope
   
   module Server
+    ROOT_DIR = File.dirname(File.expand_path(__FILE__))
     class App < Sinatra::Base
-      dir = File.dirname(File.expand_path(__FILE__))
-
+      
       configure do
         puts "Configure with reloader..."
         require 'sinatra/reloader'
@@ -12,8 +12,8 @@ module Hope
         also_reload "lib/**/*.rb"
       end
 
-      set :views,  "#{dir}/views"
-      set :public, "#{dir}/public"
+      set :views,  "#{Hope::Server::ROOT_DIR}/views"
+      set :public, "#{Hope::Server::ROOT_DIR}/public"
       set :static, true
 
       # Helpers

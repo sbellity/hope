@@ -11,7 +11,8 @@ class StatementView extends TBone.View
       "Statement",
       [ 
         ["statement_id",  ["text_field", "Name"]],
-        ["epl",           ["text_area", "Epl"]]
+        ["epl",           ["text_area", "Epl"]],
+        ["listener",      ["select", [true, false], "Add Listener"]]
       ]
     ]]
     

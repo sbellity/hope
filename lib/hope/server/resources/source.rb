@@ -14,8 +14,7 @@ module Hope
             source_class = Hope::Source.const_get(source_type)
             src = source_class.new(body["name"], body["opts"])
           end
-
-
+          
         end
       end
     end

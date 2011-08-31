@@ -15,6 +15,7 @@ module Hope
   class Engine
     
     java_import com.espertech.esper.client.EPServiceProviderManager
+    java_import com.espertech.esper.client.Configuration
     
     attr_reader :provider, :uri
     
@@ -26,31 +27,45 @@ module Hope
       EPServiceProviderManager.getProviderURIs.to_a
     end
     
-    def initialize uri=nil
+    def initialize uri=nil, config_file=Hope.config['engines_cfg']
+      puts "Init engine #{uri} with config: #{config_file}"
       @uri = uri || "default"
       Hope.register_engine(self)
+      @configuration = Configuration.new
+      if config_file
+        if File.exists?(config_file)
+          @configuration.configure(config_file)
+        else
+          puts "I cant find this config file: #{config_file}"
+        end
+      end
+      
       provider
       @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self if EM.reactor_running?
       @received = 0
+      @subscriptions = []
       @registered_sources = {}
       @registered_types = {}
     end
     
     def on_readable(socket, messages)
+      puts "Received event from #{socket}"
       @received += 1
-      src, msg = messages
-      src_name = src.copy_out_string
-      if self.register_source(src_name)
-        evt = JSON.parse(msg.copy_out_string)
-        # puts "OnReadable, sendding: #{evt.inspect}"
-        self.sendEvent(evt["data"], evt["type"])
+      src_name, msg = messages.map(&:copy_out_string)
+      if src = self.register_source(src_name)
+        evts = src.parse(msg)
+        
+        Array(evts).map do |e| 
+          puts ">> sendEvent: #{e.inspect}"
+          self.sendEvent(e)
+        end
       else
         puts "Error: SOURCE #{src_name}, not registered !"
       end
     end    
 
     def register_source src_name
-      return true if @registered_sources[src_name]
+      return @registered_sources[src_name] if @registered_sources[src_name]
       src = Hope::Source.sources[src_name]
       return false if src.nil?
       src.class.event_types.each do |event_type|
@@ -58,23 +73,27 @@ module Hope
         self.add_event_type(event_type)
       end
       @registered_sources[src] = src
+      src
     end
     
     def subscribe source_name
+      return true if @subscriptions.include?(source_name)
       @sub.subscribe source_name
+      @subscriptions << source_name
       register_source(source_name)
     end
 
     def unsubscribe source_name
+      @subscriptions - [source_name]
       @sub.unsubscribe source_name
     end
 
     # Provider API
     def provider
       if uri.nil?
-        @provider ||= EPServiceProviderManager.getDefaultProvider
+        @provider ||= EPServiceProviderManager.getDefaultProvider(@configuration)
       else
-        @provider ||= EPServiceProviderManager.getProvider(uri)
+        @provider ||= EPServiceProviderManager.getProvider(uri, @configuration)
       end
     end
     
@@ -87,6 +106,14 @@ module Hope
 
     def destroyed?
       provider.destroyed?
+    end
+    
+    def reset
+      # @subscriptions.each { |sub| self.unsubscribe(sub) }
+      statements.map do |st|
+        st.remove_all_listeners
+        st.destroy
+      end
     end
     
     # Admin API
@@ -136,8 +163,12 @@ module Hope
       provider.getEPRuntime
     end
     
-    def sendEvent(e, type)
-      runtime.sendEvent(e, type)
+    def sendEvent(e, type=nil)
+      if type
+        runtime.sendEvent(e, type)
+      else
+        runtime.sendEvent(e)
+      end
     end
     
     # Misc
@@ -145,7 +176,8 @@ module Hope
       {
         :id => uri,
         :received => @received,
-        :statements => statements.map(&:serializable_hash)
+        :statements => statements.map(&:serializable_hash),
+        :subscriptions => @subscriptions
       }
     end
     

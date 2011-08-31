@@ -22,5 +22,9 @@ module Hope
       serializable_hash.to_json
     end
   
+    def parse m
+      JSON.parse m
+    end
+  
   end
 end
