@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email           = ['sbellity@gmail.com']
 
   s.executables     = 'hope-web'
-  s.files           = Dir.glob('{bin,lib}/**/*') + %w(README.rdoc LICENCE.txt Gemfile hope.gemspec)
+  s.files           = Dir.glob('{bin,lib}/**/*') + %w(README.rdoc LICENSE.txt Gemfile hope.gemspec)
   
   s.platform        = 'java'
   s.require_paths   = ['lib']
