@@ -9,7 +9,7 @@ module Hope
       @socket = opts["socket"] || "ipc://hope"
       @event_type = opts["event_type"]
       @received = { :success => 0, :errors => 0, :latest_error => "" }
-      @sub = Hope.ctx.connect ZMQ::SUB, @socket, self
+      @sub = Hope.ctx.bind ZMQ::SUB, @socket, self
       @sub.subscribe name
       Hope::Source.register self
     end
