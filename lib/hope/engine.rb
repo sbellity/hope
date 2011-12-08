@@ -17,7 +17,7 @@ module Hope
     java_import com.espertech.esper.client.EPServiceProviderManager
     java_import com.espertech.esper.client.Configuration
     
-    attr_reader :provider, :uri
+    attr_reader :provider, :uri, :deployments
     
     def self.get uri=nil
       Hope.engines[uri]
@@ -41,26 +41,30 @@ module Hope
       end
       
       provider
-      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self if EM.reactor_running?
+      @sub = Hope.ctx.connect ZMQ::SUB, "ipc://hope", self
+      @sub.subscribe uri
       @received = 0
       @subscriptions = []
+      @deployments = {}
       @registered_sources = {}
       @registered_types = {}
     end
     
     def on_readable(socket, messages)
-      puts "Received event from #{socket}"
       @received += 1
       src_name, msg = messages.map(&:copy_out_string)
-      if src = self.register_source(src_name)
-        evts = src.parse(msg)
-        
-        Array(evts).map do |e| 
-          puts ">> sendEvent: #{e.inspect}"
-          self.sendEvent(e)
-        end
+      if src = self.register_source(src_name)      
+        evts, evts_type = src.parse(msg)
       else
-        puts "Error: SOURCE #{src_name}, not registered !"
+        puts "event not from a registered source: #{src_name}"
+        evts, evts_type = JSON.parse(msg)
+      end
+      if evts.is_a?(Hash)
+        self.sendEvent(evts, evts_type)
+      else
+        Array(evts).map do |e|
+          self.sendEvent(e, evts_type)
+        end
       end
     end    
 
@@ -78,6 +82,7 @@ module Hope
     
     def subscribe source_name
       return true if @subscriptions.include?(source_name)
+      puts "Subscribing #{uri} to #{source_name}"
       @sub.subscribe source_name
       @subscriptions << source_name
       register_source(source_name)
@@ -86,6 +91,55 @@ module Hope
     def unsubscribe source_name
       @subscriptions - [source_name]
       @sub.unsubscribe source_name
+    end
+
+
+    # Deployment API
+    
+    def epl_stream epl_file
+      com.espertech.esper.client.EPServiceProviderManager.java_class.class_loader.getResourceAsStream(epl_file)
+    end
+    
+    def deployment_info did
+      admin.getDeploymentAdmin.getDeployment did
+    end
+    
+    def deploy epl_file
+      begin
+        stream = epl_stream(epl_file)
+        return false unless stream
+        module_uri = epl_file.gsub(/\.epl$/, '')
+        puts "Deploying module #{module_uri}..."
+        undeploy_module(module_uri)
+        res = admin.getDeploymentAdmin.readDeploy(stream, module_uri, nil, nil)
+        puts "DeploymentResult: #{res.toString}"
+        if res
+          puts "Adding listeners to deployed statements, publishing to: #{"ipc://#{self.uri}-responses"}"
+          res.getStatements.each do |s|
+            s.addListener(Hope::Listener::Pub.new(s.getName, "socket" => "ipc://#{self.uri}-responses"))
+          end
+        end
+        @deployments[module_uri] = res
+      rescue => err
+        puts "Deployment failed: #{err}"
+        return false
+      end
+    end
+    
+    def undeploy_module module_uri
+      d = @deployments[module_uri]
+      return false unless d
+      undeploy d.getDeploymentId, true
+    end
+    
+    def undeploy did, remove=true
+      return false unless deployment_info(did)
+      puts "Undeploy: #{did}"
+      if remove
+        admin.getDeploymentAdmin.undeployRemove did
+      else
+        admin.getDeploymentAdmin.undeploy did
+      end
     end
 
     # Provider API
@@ -164,10 +218,17 @@ module Hope
     end
     
     def sendEvent(e, type=nil)
-      if type
-        runtime.sendEvent(e, type)
-      else
-        runtime.sendEvent(e)
+      begin
+        if type
+          runtime.sendEvent(e, type)
+        else
+          runtime.sendEvent(e)
+        end
+      rescue => err
+        puts "\n\n\n\n\n\n----------------------------\nEngine Error: #{err}"
+        puts "Error sending Event[#{type}]=#{e.inspect}"
+        puts "Backtrace: \n#{err.backtrace.join("\n>")}"
+        puts "-----------------------------\n\n\n\n"
       end
     end
     
@@ -175,9 +236,10 @@ module Hope
     def serializable_hash
       {
         :id => uri,
-        :received => @received,
-        :statements => statements.map(&:serializable_hash),
-        :subscriptions => @subscriptions
+        :received       => @received,
+        :statements     => statements.map(&:serializable_hash),
+        :subscriptions  => @subscriptions,
+        :deployments    => deployments
       }
     end
     

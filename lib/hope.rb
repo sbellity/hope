@@ -24,8 +24,11 @@ require "hope/source/sub"
 # require "hope/source/twitter"
 
 require "hope/listener/base"
+require "hope/listener/pub"
 
 require 'hope/server'
+
+require 'hope/dispatcher'
 
 module Hope
   include Java
@@ -44,7 +47,7 @@ module Hope
 
   def self.configure config_file, &block
     @config = YAML::load_file(config_file)
-    Hope::Source
+    # Hope::Source
     # Add Sources
     @config["sources"].each do |sn, src_opts|
       begin

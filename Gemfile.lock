@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hope (0.1.0-java)
+    hope (0.1.1-java)
       em-zeromq (~> 0.2.1)
       json-jruby (~> 1.4)
       sinatra (~> 1.0.0)

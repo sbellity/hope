@@ -15,7 +15,7 @@ module Hope
       set :views,  "#{Hope::Server::ROOT_DIR}/views"
       set :public, "#{Hope::Server::ROOT_DIR}/public"
       set :static, true
-
+      
       # Helpers
       helpers   Hope::Server::Helpers
 
